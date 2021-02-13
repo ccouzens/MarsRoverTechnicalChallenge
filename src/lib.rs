@@ -1,9 +1,10 @@
 type CoordinateUnit = i16;
 
 mod instruction;
-pub mod plateau;
+mod plateau;
 pub mod rover;
 pub use instruction::{Instruction, ParseInstructionError};
+pub use plateau::{OutOfPlataeuError, ParsePlateauError, Plateau};
 pub use rover::Rover;
 
 #[derive(Debug, PartialEq)]

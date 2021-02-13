@@ -64,9 +64,9 @@ impl Display for Rover {
 
 #[derive(Debug, PartialEq)]
 pub struct Rover {
-    x: CoordinateUnit,
-    y: CoordinateUnit,
-    direction: Direction,
+    pub x: CoordinateUnit,
+    pub y: CoordinateUnit,
+    pub direction: Direction,
 }
 
 impl Rover {

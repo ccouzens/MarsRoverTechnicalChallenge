@@ -1,9 +1,10 @@
-use mars_rover_technical_challenge::plateau::{ParsePlateauError, Plateau};
 use mars_rover_technical_challenge::rover::ParseRoverError;
 use mars_rover_technical_challenge::ParseInstructionError;
+use mars_rover_technical_challenge::Plateau;
 use mars_rover_technical_challenge::{Instruction, Rover};
+use mars_rover_technical_challenge::{OutOfPlataeuError, ParsePlateauError};
 use std::convert::TryFrom;
-use std::io::{self};
+use std::io;
 use std::io::{BufRead, Write};
 use thiserror::Error;
 
@@ -23,6 +24,8 @@ pub enum InteractionError {
     MissingInstructions,
     #[error("Invalid Instruction")]
     InvalidInstruction(#[from] ParseInstructionError),
+    #[error("Outside Plateau")]
+    OutsidePlateau(#[from] OutOfPlataeuError),
 }
 
 fn interact<R: BufRead, W: Write>(input: R, output: &mut W) -> Result<(), InteractionError> {
@@ -33,11 +36,15 @@ fn interact<R: BufRead, W: Write>(input: R, output: &mut W) -> Result<(), Intera
         .parse()?;
     while let Some(rover_line) = lines.next() {
         let mut rover: Rover = rover_line?.parse()?;
+
+        plateau.confirm_within(rover.x, rover.y)?;
+
         let instructions = lines
             .next()
             .ok_or(InteractionError::MissingInstructions)??;
         for instruction in instructions.chars().map(Instruction::try_from) {
             rover.follow_instruction(instruction?);
+            plateau.confirm_within(rover.x, rover.y)?;
         }
         writeln!(output, "{}", rover).map_err(InteractionError::Output)?;
     }
@@ -45,8 +52,7 @@ fn interact<R: BufRead, W: Write>(input: R, output: &mut W) -> Result<(), Intera
 }
 
 fn main() -> Result<(), InteractionError> {
-    interact(&mut io::stdin().lock(), &mut io::stdout().lock())?;
-    Ok(())
+    interact(&mut io::stdin().lock(), &mut io::stdout().lock())
 }
 
 #[cfg(test)]
@@ -72,5 +78,80 @@ MMRMMRMRRM
 "
             ))
         );
+    }
+
+    #[test]
+    fn rover_crashes_when_leaving_the_plateau_north() {
+        const INPUT: &[u8] = b"10 5
+5 5 N
+M
+";
+
+        assert!(matches!(
+            interact(INPUT, &mut vec![]),
+            Err(InteractionError::OutsidePlateau(
+                OutOfPlataeuError::Outside { y: 6, .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn rover_crashes_when_leaving_the_plateau_east() {
+        const INPUT: &[u8] = b"5 10
+5 5 E
+M
+";
+
+        assert!(matches!(
+            interact(INPUT, &mut vec![]),
+            Err(InteractionError::OutsidePlateau(
+                OutOfPlataeuError::Outside { x: 6, .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn rover_crashes_when_leaving_the_plateau_south() {
+        const INPUT: &[u8] = b"5 5
+5 0 S
+M
+";
+
+        assert!(matches!(
+            interact(INPUT, &mut vec![]),
+            Err(InteractionError::OutsidePlateau(
+                OutOfPlataeuError::Outside { y: -1, .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn rover_crashes_when_leaving_the_plateau_west() {
+        const INPUT: &[u8] = b"5 5
+0 5 W
+M
+";
+
+        assert!(matches!(
+            interact(INPUT, &mut vec![]),
+            Err(InteractionError::OutsidePlateau(
+                OutOfPlataeuError::Outside { x: -1, .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn rover_crashes_when_starting_outside_the_plateau() {
+        const INPUT: &[u8] = b"5 5
+6 2 W
+M
+";
+
+        assert!(matches!(
+            interact(INPUT, &mut vec![]),
+            Err(InteractionError::OutsidePlateau(
+                OutOfPlataeuError::Outside { x: 6, .. }
+            ))
+        ));
     }
 }
