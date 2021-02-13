@@ -52,8 +52,10 @@ fn interact<R: io::BufRead, W: io::Write>(
     Ok(())
 }
 
-fn main() -> Result<(), InteractionError> {
-    interact(&mut io::stdin().lock(), &mut io::stdout().lock())
+fn main() -> color_eyre::eyre::Result<()> {
+    color_eyre::install()?;
+    interact(&mut io::stdin().lock(), &mut io::stdout().lock())?;
+    Ok(())
 }
 
 #[cfg(test)]
