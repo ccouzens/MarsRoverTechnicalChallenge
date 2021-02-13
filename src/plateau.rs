@@ -1,4 +1,4 @@
-type CoordinateUnit = i16;
+use crate::CoordinateUnit;
 use std::num::ParseIntError;
 use std::str::FromStr;
 use thiserror::Error;
