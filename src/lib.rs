@@ -4,7 +4,7 @@ mod direction;
 mod instruction;
 mod plateau;
 mod rover;
-pub use direction::Direction;
+pub use direction::{Direction, ParseDirectionError};
 pub use instruction::{Instruction, ParseInstructionError};
 pub use plateau::{OutOfPlataeuError, ParsePlateauError, Plateau};
 pub use rover::{ParseRoverError, Rover};

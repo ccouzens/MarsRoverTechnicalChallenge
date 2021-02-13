@@ -1,4 +1,10 @@
 use crate::CoordinateUnit;
+use std::str::FromStr;
+use thiserror::Error;
+
+#[derive(Error, Debug, PartialEq)]
+#[error("unrecognized direction")]
+pub struct ParseDirectionError;
 
 #[derive(Debug, PartialEq)]
 pub enum Direction {
@@ -36,6 +42,31 @@ impl Direction {
             East => South,
             South => West,
             West => North,
+        }
+    }
+}
+
+impl FromStr for Direction {
+    type Err = ParseDirectionError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "N" => Ok(Direction::North),
+            "E" => Ok(Direction::East),
+            "S" => Ok(Direction::South),
+            "W" => Ok(Direction::West),
+            _ => Err(ParseDirectionError),
+        }
+    }
+}
+
+impl From<&Direction> for char {
+    fn from(direction: &Direction) -> Self {
+        match direction {
+            Direction::North => 'N',
+            Direction::East => 'E',
+            Direction::South => 'S',
+            Direction::West => 'W',
         }
     }
 }

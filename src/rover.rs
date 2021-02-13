@@ -1,6 +1,7 @@
 use crate::CoordinateUnit;
 use crate::Direction;
 use crate::Instruction;
+use crate::ParseDirectionError;
 use std::fmt::Display;
 use std::num::ParseIntError;
 
@@ -20,7 +21,7 @@ pub enum ParseRoverError {
     #[error("couldn't parse y")]
     UnparsableY(ParseIntError),
     #[error("couldn't parse direction")]
-    UnparsableDirection,
+    UnparsableDirection(#[from] ParseDirectionError),
 }
 
 impl FromStr for Rover {
@@ -38,13 +39,10 @@ impl FromStr for Rover {
             .ok_or(ParseRoverError::MissingY)?
             .parse()
             .map_err(ParseRoverError::UnparsableY)?;
-        let direction = match details.next().ok_or(ParseRoverError::MissingDirection)? {
-            "N" => Direction::North,
-            "E" => Direction::East,
-            "S" => Direction::South,
-            "W" => Direction::West,
-            _ => return Err(ParseRoverError::UnparsableDirection),
-        };
+        let direction = details
+            .next()
+            .ok_or(ParseRoverError::MissingDirection)?
+            .parse()?;
 
         Ok(Rover { x, y, direction })
     }
@@ -52,13 +50,7 @@ impl FromStr for Rover {
 
 impl Display for Rover {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let direction = match self.direction {
-            Direction::North => 'N',
-            Direction::East => 'E',
-            Direction::South => 'S',
-            Direction::West => 'W',
-        };
-        write!(f, "{} {} {}", self.x, self.y, direction)
+        write!(f, "{} {} {}", self.x, self.y, char::from(&self.direction))
     }
 }
 
