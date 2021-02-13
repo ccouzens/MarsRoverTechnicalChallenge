@@ -1,13 +1,17 @@
 type CoordinateUnit = i16;
 
-enum Command {
+pub mod plateau;
+pub mod rover;
+pub use rover::Rover;
+
+pub enum Command {
     Left,
     Right,
     Move,
 }
 
 #[derive(Debug, PartialEq)]
-enum Direction {
+pub enum Direction {
     North,
     East,
     South,
@@ -42,32 +46,6 @@ impl Direction {
             East => South,
             South => West,
             West => North,
-        }
-    }
-}
-
-#[derive(Debug, PartialEq)]
-struct Rover {
-    x: CoordinateUnit,
-    y: CoordinateUnit,
-    direction: Direction,
-}
-
-impl Rover {
-    fn new(x: CoordinateUnit, y: CoordinateUnit, direction: Direction) -> Self {
-        Self { x, y, direction }
-    }
-
-    fn follow_command(&mut self, command: Command) {
-        use Command::*;
-        match command {
-            Left => self.direction = self.direction.rotate_left(),
-            Right => self.direction = self.direction.rotate_right(),
-            Move => {
-                let vector = self.direction.to_vector();
-                self.x += vector.0;
-                self.y += vector.1;
-            }
         }
     }
 }
