@@ -1,6 +1,6 @@
-use crate::Command;
 use crate::CoordinateUnit;
 use crate::Direction;
+use crate::Instruction;
 use std::fmt::Display;
 use std::num::ParseIntError;
 
@@ -74,9 +74,9 @@ impl Rover {
         Self { x, y, direction }
     }
 
-    pub fn follow_command(&mut self, command: Command) {
-        use Command::*;
-        match command {
+    pub fn follow_instruction(&mut self, instruction: Instruction) {
+        use Instruction::*;
+        match instruction {
             Left => self.direction = self.direction.rotate_left(),
             Right => self.direction = self.direction.rotate_right(),
             Move => {

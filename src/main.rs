@@ -1,6 +1,8 @@
 use mars_rover_technical_challenge::plateau::{ParsePlateauError, Plateau};
 use mars_rover_technical_challenge::rover::ParseRoverError;
-use mars_rover_technical_challenge::{Command, Rover};
+use mars_rover_technical_challenge::ParseInstructionError;
+use mars_rover_technical_challenge::{Instruction, Rover};
+use std::convert::TryFrom;
 use std::io::{self};
 use std::io::{BufRead, Write};
 use thiserror::Error;
@@ -19,8 +21,8 @@ pub enum InteractionError {
     RoverInvalid(#[from] ParseRoverError),
     #[error("Expected instructions for rover")]
     MissingInstructions,
-    #[error("Invalid Instruction {0}")]
-    InvalidInstruction(char),
+    #[error("Invalid Instruction")]
+    InvalidInstruction(#[from] ParseInstructionError),
 }
 
 fn interact<R: BufRead, W: Write>(input: R, output: &mut W) -> Result<(), InteractionError> {
@@ -34,14 +36,8 @@ fn interact<R: BufRead, W: Write>(input: R, output: &mut W) -> Result<(), Intera
         let instructions = lines
             .next()
             .ok_or(InteractionError::MissingInstructions)??;
-        for instruction in instructions.chars() {
-            let command = match instruction {
-                'L' => Command::Left,
-                'R' => Command::Right,
-                'M' => Command::Move,
-                o => return Err(InteractionError::InvalidInstruction(o)),
-            };
-            rover.follow_command(command);
+        for instruction in instructions.chars().map(Instruction::try_from) {
+            rover.follow_instruction(instruction?);
         }
         writeln!(output, "{}", rover).map_err(InteractionError::Output)?;
     }
@@ -58,7 +54,7 @@ mod tests {
     use crate::*;
 
     #[test]
-    fn rovers_can_follow_commands() {
+    fn rovers_can_follow_instructions() {
         const INPUT: &[u8] = b"5 5
 1 2 N
 LMLMLMLMM
