@@ -67,3 +67,18 @@ the grid squares are much larger than a rover and that they won't collide.
 
 It is unclear what should happen if a rover leaves the plateau. I will treat it
 as an error if it happens.
+
+## Usage
+
+Provide the input as STDIN to the program.
+
+The output will then be written to STDOUT.
+
+```bash
+cargo run <<< '5 5
+1 2 N
+LMLMLMLMM
+3 3 E
+MMRMMRMRRM
+'
+```
