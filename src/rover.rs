@@ -10,17 +10,17 @@ use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
 pub enum ParseRoverError {
-    #[error("missing x")]
+    #[error("Missing x")]
     MissingX,
-    #[error("missing y")]
+    #[error("Missing y")]
     MissingY,
-    #[error("missing direction")]
+    #[error("Missing direction")]
     MissingDirection,
-    #[error("couldn't parse x")]
+    #[error("Couldn't parse x")]
     UnparsableX(ParseIntError),
-    #[error("couldn't parse y")]
+    #[error("Couldn't parse y")]
     UnparsableY(ParseIntError),
-    #[error("couldn't parse direction")]
+    #[error("Couldn't parse direction")]
     UnparsableDirection(#[from] ParseDirectionError),
 }
 

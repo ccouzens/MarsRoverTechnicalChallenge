@@ -20,9 +20,9 @@ pub enum InteractionError {
     RoverInvalid(#[from] ParseRoverError),
     #[error("Expected instructions for rover")]
     MissingInstructions,
-    #[error("Invalid Instruction")]
+    #[error("Invalid instruction")]
     InvalidInstruction(#[from] ParseInstructionError),
-    #[error("Outside Plateau")]
+    #[error("Rover is outside plateau")]
     OutsidePlateau(#[from] OutOfPlataeuError),
 }
 
@@ -92,9 +92,10 @@ M
 
         assert!(matches!(
             interact(INPUT, &mut vec![]),
-            Err(InteractionError::OutsidePlateau(
-                OutOfPlataeuError::Outside { y: 6, .. }
-            ))
+            Err(InteractionError::OutsidePlateau(OutOfPlataeuError {
+                y: 6,
+                ..
+            }))
         ));
     }
 
@@ -107,9 +108,10 @@ M
 
         assert!(matches!(
             interact(INPUT, &mut vec![]),
-            Err(InteractionError::OutsidePlateau(
-                OutOfPlataeuError::Outside { x: 6, .. }
-            ))
+            Err(InteractionError::OutsidePlateau(OutOfPlataeuError {
+                x: 6,
+                ..
+            }))
         ));
     }
 
@@ -122,9 +124,10 @@ M
 
         assert!(matches!(
             interact(INPUT, &mut vec![]),
-            Err(InteractionError::OutsidePlateau(
-                OutOfPlataeuError::Outside { y: -1, .. }
-            ))
+            Err(InteractionError::OutsidePlateau(OutOfPlataeuError {
+                y: -1,
+                ..
+            }))
         ));
     }
 
@@ -137,9 +140,10 @@ M
 
         assert!(matches!(
             interact(INPUT, &mut vec![]),
-            Err(InteractionError::OutsidePlateau(
-                OutOfPlataeuError::Outside { x: -1, .. }
-            ))
+            Err(InteractionError::OutsidePlateau(OutOfPlataeuError {
+                x: -1,
+                ..
+            }))
         ));
     }
 
@@ -152,9 +156,10 @@ M
 
         assert!(matches!(
             interact(INPUT, &mut vec![]),
-            Err(InteractionError::OutsidePlateau(
-                OutOfPlataeuError::Outside { x: 6, .. }
-            ))
+            Err(InteractionError::OutsidePlateau(OutOfPlataeuError {
+                x: 6,
+                ..
+            }))
         ));
     }
 }

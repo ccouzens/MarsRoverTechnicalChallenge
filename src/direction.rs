@@ -3,7 +3,7 @@ use std::str::FromStr;
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
-#[error("unrecognized direction")]
+#[error("Unrecognized direction")]
 pub struct ParseDirectionError;
 
 #[derive(Debug, PartialEq)]

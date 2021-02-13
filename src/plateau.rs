@@ -5,25 +5,23 @@ use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
 pub enum ParsePlateauError {
-    #[error("missing upper x")]
+    #[error("Missing upper x")]
     MissingUpperX,
-    #[error("missing upper y")]
+    #[error("Missing upper y")]
     MissingUpperY,
-    #[error("couldn't parse upper x")]
+    #[error("Couldn't parse upper x")]
     UnparsableUpperX(ParseIntError),
-    #[error("couldn't parse upper y")]
+    #[error("Couldn't parse upper y")]
     UnparsableUpperY(ParseIntError),
 }
 
 #[derive(Error, Debug, PartialEq)]
-pub enum OutOfPlataeuError {
-    #[error("({x:}, {y:}) is not within the interval [(0, 0), ({upper_x:}, {upper_y:})]")]
-    Outside {
-        x: CoordinateUnit,
-        y: CoordinateUnit,
-        upper_x: CoordinateUnit,
-        upper_y: CoordinateUnit,
-    },
+#[error("({x:}, {y:}) is not within the plateau [(0, 0), ({upper_x:}, {upper_y:})]")]
+pub struct OutOfPlataeuError {
+    pub x: CoordinateUnit,
+    pub y: CoordinateUnit,
+    upper_x: CoordinateUnit,
+    upper_y: CoordinateUnit,
 }
 
 #[derive(Debug, PartialEq)]
@@ -58,7 +56,7 @@ impl Plateau {
         if x >= 0 && x <= self.upper_x && y >= 0 && y <= self.upper_y {
             Ok(())
         } else {
-            Err(OutOfPlataeuError::Outside {
+            Err(OutOfPlataeuError {
                 x,
                 y,
                 upper_x: self.upper_x,

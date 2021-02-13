@@ -8,10 +8,8 @@ pub enum Instruction {
 }
 
 #[derive(Error, Debug, PartialEq)]
-pub enum ParseInstructionError {
-    #[error("unrecognized instruction {0}")]
-    Unrecognized(char),
-}
+#[error("Unrecognized instruction {0}")]
+pub struct ParseInstructionError(char);
 
 impl TryFrom<char> for Instruction {
     type Error = ParseInstructionError;
@@ -21,7 +19,7 @@ impl TryFrom<char> for Instruction {
             'L' => Ok(Instruction::Left),
             'R' => Ok(Instruction::Right),
             'M' => Ok(Instruction::Move),
-            o => Err(ParseInstructionError::Unrecognized(o)),
+            o => Err(ParseInstructionError(o)),
         }
     }
 }
