@@ -1,11 +1,9 @@
-use mars_rover_technical_challenge::rover::ParseRoverError;
-use mars_rover_technical_challenge::ParseInstructionError;
-use mars_rover_technical_challenge::Plateau;
-use mars_rover_technical_challenge::{Instruction, Rover};
-use mars_rover_technical_challenge::{OutOfPlataeuError, ParsePlateauError};
+use mars_rover_technical_challenge::{
+    Instruction, OutOfPlataeuError, ParseInstructionError, ParsePlateauError, ParseRoverError,
+    Plateau, Rover,
+};
 use std::convert::TryFrom;
 use std::io;
-use std::io::{BufRead, Write};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -28,7 +26,10 @@ pub enum InteractionError {
     OutsidePlateau(#[from] OutOfPlataeuError),
 }
 
-fn interact<R: BufRead, W: Write>(input: R, output: &mut W) -> Result<(), InteractionError> {
+fn interact<R: io::BufRead, W: io::Write>(
+    input: R,
+    output: &mut W,
+) -> Result<(), InteractionError> {
     let mut lines = input.lines();
     let plateau: Plateau = lines
         .next()

@@ -1,51 +1,13 @@
 type CoordinateUnit = i16;
 
+mod direction;
 mod instruction;
 mod plateau;
-pub mod rover;
+mod rover;
+pub use direction::Direction;
 pub use instruction::{Instruction, ParseInstructionError};
 pub use plateau::{OutOfPlataeuError, ParsePlateauError, Plateau};
-pub use rover::Rover;
-
-#[derive(Debug, PartialEq)]
-pub enum Direction {
-    North,
-    East,
-    South,
-    West,
-}
-
-impl Direction {
-    fn to_vector(&self) -> (CoordinateUnit, CoordinateUnit) {
-        use Direction::*;
-        match self {
-            North => (0, 1),
-            East => (1, 0),
-            South => (0, -1),
-            West => (-1, 0),
-        }
-    }
-
-    fn rotate_left(&self) -> Self {
-        use Direction::*;
-        match self {
-            North => West,
-            East => North,
-            South => East,
-            West => South,
-        }
-    }
-
-    fn rotate_right(&self) -> Self {
-        use Direction::*;
-        match self {
-            North => East,
-            East => South,
-            South => West,
-            West => North,
-        }
-    }
-}
+pub use rover::{ParseRoverError, Rover};
 
 #[cfg(test)]
 mod tests {
