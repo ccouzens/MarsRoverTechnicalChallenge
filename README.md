@@ -1,6 +1,6 @@
 # Mars Rover Technical Challenge
 
-## MARS ROVERS
+## Original Problem
 
 A squad of robotic rovers are to be landed by NASA on a plateau on Mars.
 
@@ -59,3 +59,11 @@ MMRMMRMRRM
 1 3 N
 5 1 E
 ```
+
+## Analysis
+
+It is unclear if multiple rovers can occupy the same grid square. I will presume
+the grid squares are much larger than a rover and that they won't collide.
+
+It is unclear what should happen if a rover leaves the plateau. I will treat it
+as an error if it happens.
