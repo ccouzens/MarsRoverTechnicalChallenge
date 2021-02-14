@@ -26,25 +26,24 @@ pub enum InteractionError {
     OutsidePlateau(#[from] OutOfPlataeuError),
 }
 
-fn interact<R: io::BufRead, W: io::Write>(
-    input: R,
-    output: &mut W,
-) -> Result<(), InteractionError> {
-    let mut lines = input.lines();
-    let plateau: Plateau = lines
+fn interact(input: impl io::BufRead, mut output: impl io::Write) -> Result<(), InteractionError> {
+    let mut input_lines = input.lines();
+    let plateau: Plateau = input_lines
         .next()
         .ok_or(InteractionError::MissingPlateau)??
         .parse()?;
-    while let Some(rover_line) = lines.next() {
+
+    while let Some(rover_line) = input_lines.next() {
         let mut rover: Rover = rover_line?.parse()?;
 
         plateau.confirm_within(rover.x, rover.y)?;
 
-        let instructions = lines
+        let instructions_line = input_lines
             .next()
             .ok_or(InteractionError::MissingInstructions)??;
-        for instruction in instructions.chars().map(Instruction::try_from) {
-            rover.follow_instruction(instruction?);
+        for instruction_char in instructions_line.chars() {
+            let instruction = Instruction::try_from(instruction_char)?;
+            rover.follow_instruction(instruction);
             plateau.confirm_within(rover.x, rover.y)?;
         }
         writeln!(output, "{}", rover).map_err(InteractionError::Output)?;
@@ -54,7 +53,7 @@ fn interact<R: io::BufRead, W: io::Write>(
 
 fn main() -> color_eyre::eyre::Result<()> {
     color_eyre::install()?;
-    interact(&mut io::stdin().lock(), &mut io::stdout().lock())?;
+    interact(io::stdin().lock(), io::stdout())?;
     Ok(())
 }
 
@@ -64,34 +63,20 @@ mod tests {
 
     #[test]
     fn rovers_can_follow_instructions() {
-        const INPUT: &[u8] = b"5 5
-1 2 N
-LMLMLMLMM
-3 3 E
-MMRMMRMRRM
-";
+        const INPUT: &[u8] = b"5 5\n1 2 N\nLMLMLMLMM\n3 3 E\nMMRMMRMRRM\n";
 
         let mut output = vec![];
         interact(INPUT, &mut output).unwrap();
         assert_eq!(
             String::from_utf8(output),
-            Ok(String::from(
-                "1 3 N
-5 1 E
-"
-            ))
+            Ok(String::from("1 3 N\n5 1 E\n"))
         );
     }
 
     #[test]
     fn rover_crashes_when_leaving_the_plateau_north() {
-        const INPUT: &[u8] = b"10 5
-5 5 N
-M
-";
-
         assert!(matches!(
-            interact(INPUT, &mut vec![]),
+            interact(b"10 5\n5 5 N\nM" as &[u8], &mut vec![]),
             Err(InteractionError::OutsidePlateau(OutOfPlataeuError {
                 y: 6,
                 ..
@@ -101,13 +86,8 @@ M
 
     #[test]
     fn rover_crashes_when_leaving_the_plateau_east() {
-        const INPUT: &[u8] = b"5 10
-5 5 E
-M
-";
-
         assert!(matches!(
-            interact(INPUT, &mut vec![]),
+            interact(b"5 10\n5 5 E\nM" as &[u8], &mut vec![]),
             Err(InteractionError::OutsidePlateau(OutOfPlataeuError {
                 x: 6,
                 ..
@@ -117,13 +97,8 @@ M
 
     #[test]
     fn rover_crashes_when_leaving_the_plateau_south() {
-        const INPUT: &[u8] = b"5 5
-5 0 S
-M
-";
-
         assert!(matches!(
-            interact(INPUT, &mut vec![]),
+            interact(b"5 5\n5 0 S\nM" as &[u8], &mut vec![]),
             Err(InteractionError::OutsidePlateau(OutOfPlataeuError {
                 y: -1,
                 ..
@@ -133,13 +108,8 @@ M
 
     #[test]
     fn rover_crashes_when_leaving_the_plateau_west() {
-        const INPUT: &[u8] = b"5 5
-0 5 W
-M
-";
-
         assert!(matches!(
-            interact(INPUT, &mut vec![]),
+            interact(b"5 5\n0 5 W\nM" as &[u8], &mut vec![]),
             Err(InteractionError::OutsidePlateau(OutOfPlataeuError {
                 x: -1,
                 ..
@@ -149,13 +119,8 @@ M
 
     #[test]
     fn rover_crashes_when_starting_outside_the_plateau() {
-        const INPUT: &[u8] = b"5 5
-6 2 W
-M
-";
-
         assert!(matches!(
-            interact(INPUT, &mut vec![]),
+            interact(b"5 5\n6 2 W\nM" as &[u8], &mut vec![]),
             Err(InteractionError::OutsidePlateau(OutOfPlataeuError {
                 x: 6,
                 ..

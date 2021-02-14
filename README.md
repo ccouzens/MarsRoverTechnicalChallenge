@@ -80,4 +80,7 @@ cargo run <<< '5 5
 LMLMLMLMM
 3 3 E
 MMRMMRMRRM'
+
+# 1 3 N
+# 5 1 E
 ```
